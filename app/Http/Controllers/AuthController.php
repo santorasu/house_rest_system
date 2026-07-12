@@ -15,11 +15,12 @@ class AuthController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            // 'email' => 'required|string|email|indisposable|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|in:user,owner',
         ], [
             'email.indisposable' => 'Please provide a valid email address.',
+            'role.in' => 'The selected role is invalid. Valid roles are: user, owner.',
         ]);
 
         $user = User::create([
@@ -28,8 +29,8 @@ class AuthController extends Controller
             'password' => Hash::make($validatedData['password']),
         ]);
 
-        // Assign 'user' role by default
-        $user->assignRole('user');
+        // Assign the selected role
+        $user->assignRole($validatedData['role']);
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -40,7 +41,7 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => 'user',
+                'role' => $validatedData['role'],
             ],
         ], 201);
     }

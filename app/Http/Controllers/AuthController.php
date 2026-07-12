@@ -15,6 +15,7 @@ class AuthController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            // 'email' => 'required|string|email|indisposable|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ], [
@@ -53,7 +54,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
+
             // Generate token
             $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -70,7 +71,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'Invalid credentials'
+            'message' => 'Invalid credentials',
         ], 401);
     }
 }
